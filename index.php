@@ -18,6 +18,5 @@ class DispatchApp extends BaseDispatchApp {
 
 }
 
-$dispatch_app = new DispatchApp;
-$dispatch_app->run();
+DispatchApp::getInstance()->run();
 ?>

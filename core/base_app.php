@@ -1,7 +1,7 @@
 <?php
 require_once ROOT_DIR . '/apps/shared/func_definitions.php';
 
-abstract class AbstractApp {
+abstract class AbstractApp extends Singleton {
   protected $filter_handler = NULL;
 
   public function setFilterHandler($filter_handler) {
@@ -61,9 +61,12 @@ abstract class BaseApp extends AbstractApp {
       View::assignGlobal('CATES', Configure::fetch('apps'));
       View::assignGlobal('DIR_NAME', Configure::fetch('dir_name'));
       Configure::write('index_url', 'http://' . $_SERVER['HTTP_HOST'] . '/' . Configure::fetch('dir_name'));
-
+      
+      $cur_app = preg_replace("/^(\S+)\/(\w+)\//i", "$2", $_SERVER['REQUEST_URI']);
+      Configure::write('app', $cur_app);
+      View::assignGlobal('CUR_APP', $cur_app);
+      
       $this -> view = new View;
-
     } catch (exception $e) {
       $redirect_url = 'http://' . $_SERVER['HTTP_HOST'] . strrchr(dirname($_SERVER['PHP_SELF']), '/') . '/public/400.html';
       header("Location: " . $redirect_url);

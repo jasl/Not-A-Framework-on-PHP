@@ -17,5 +17,5 @@ class App extends BaseApp {
   }
 }
 
-Kernel::getInstance()->boot();
+App::getInstance()->run();
 ?>
