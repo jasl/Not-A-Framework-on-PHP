@@ -1,0 +1,45 @@
+db:
+  conn_str: "mysql:host=localhost;dbname=ec_admin"
+  user: "root"
+  passwd: ""
+
+sa:
+  email: "jasl123@126.com"
+  passwd: "aaaaaa"
+
+salt: "jYaGs3l0qIJsIify2ilnUgbWwvC0R2G0FgaC9mi"
+
+dir_name: "ecstore_admin"
+
+auto_authorize: true
+
+dev_mode: true
+
+apps:
+  default:
+    display: "主面板"
+    apps:
+      default:
+        display: "主面板"
+        path: "dashboard"
+        lowest_role_level: 5
+  ec_admin:
+    display: "ECStore实例管理"
+    apps:
+      clear:
+        display: "重置实例"
+        path: "clear"
+        lowest_role_level: 5
+      backup:
+        display: "备份实例"
+        path: "backup"
+        lowest_role_level: 5
+  manage:
+    display: "系统管理"
+    apps:
+      manage_user: 
+        display: "用户管理"
+        path: "manage_user"
+        lowest_role_level: 0
+
+
