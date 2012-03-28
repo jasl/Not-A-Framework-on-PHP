@@ -4,6 +4,7 @@ abstract class AbstractApp extends Singleton {
   protected function __construct() {
     include_once ROOT_DIR . '/apps/shared/func_definitions.php';
   }
+
   protected $filter_handler = NULL;
 
   public function setFilterHandler($filter_handler) {
@@ -20,15 +21,6 @@ abstract class AbstractApp extends Singleton {
 abstract class BaseDispatchApp extends AbstractApp {
   protected function __construct() {
     parent::__construct();
-    try {
-      Session::init();
-      $config = &Configure::init();
-      DB::setup($config['db']['conn_str'], $config['db']['user'], $config['db']['passwd']);
-    } catch (exception $e) {
-      $redirect_url = 'http://' . $_SERVER['HTTP_HOST'] . strrchr(dirname($_SERVER['PHP_SELF']), '/') . '/public/400.html';
-      header("Location: " . $redirect_url);
-      exit ;
-    }
   }
 
   protected abstract function forward();
@@ -37,14 +29,14 @@ abstract class BaseDispatchApp extends AbstractApp {
     if (!$this -> before_filter()) {
       if (is_string($this -> filter_handler)) {
         $url = 'http://' . $_SERVER['HTTP_HOST'] . '/' . $this -> filter_handler;
-        header('Location: ' . $url);
+        AppHelper::redirect($url);
       } elseif (is_a($this -> filter_handler, 'BaseApp')) {
         $this -> filter_handler -> run();
       } elseif (is_callable($this -> filter_handler)) {
         $this -> filter_handler();
       } else {
         $url = 'http://' . $_SERVER['HTTP_HOST'] . '/' . Configure::fetch('dir_name');
-        header('Location: ' . $url);
+        AppHelper::redirect($url);
       }
       return;
     }
@@ -58,23 +50,10 @@ abstract class BaseApp extends AbstractApp {
     parent::__construct();
     try {
       include_once 'func_definitions.php';
-      Session::init();
-      $config = &Configure::init();
-      DB::setup($config['db']['conn_str'], $config['db']['user'], $config['db']['passwd']);
-      View::$DEV_MODE = $config['dev_mode'];
-      View::assignGlobal('CATES', Configure::fetch('apps'));
-      View::assignGlobal('DIR_NAME', Configure::fetch('dir_name'));
-      Configure::write('index_url', 'http://' . $_SERVER['HTTP_HOST'] . '/' . Configure::fetch('dir_name'));
-      
-      $cur_app = preg_replace("/^(\S+)\/(\w+)\//i", "$2", $_SERVER['REQUEST_URI']);
-      Configure::write('app', $cur_app);
-      View::assignGlobal('CUR_APP', $cur_app);
-      
       $this -> view = new View;
     } catch (exception $e) {
       $redirect_url = 'http://' . $_SERVER['HTTP_HOST'] . strrchr(dirname($_SERVER['PHP_SELF']), '/') . '/public/400.html';
-      header("Location: " . $redirect_url);
-      exit ;
+      AppHelper::redirect($redirect_url);
     }
   }
 
@@ -113,7 +92,7 @@ abstract class BaseApp extends AbstractApp {
         $this -> filter_handler();
       } else {
         $url = 'http://' . $_SERVER['HTTP_HOST'] . '/' . Configure::fetch('dir_name');
-        header('Location: ' . $url);
+        AppHelper::redirect($url);
       }
       return;
     }

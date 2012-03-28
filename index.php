@@ -13,10 +13,10 @@ class DispatchApp extends BaseDispatchApp {
   protected function forward() {
     $apps = Configure::fetch('apps');
     $redirect_url = 'http://' . $_SERVER['HTTP_HOST'] . strrchr(dirname($_SERVER['PHP_SELF']), '/') . '/apps/' . $apps['default']['apps']['default']['path'];
-    header("Location: " . $redirect_url);
+    AppHelper::redirect($redirect_url);
   }
 
 }
 
-DispatchApp::getInstance()->run();
+DispatchApp::getInstance() -> run();
 ?>

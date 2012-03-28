@@ -8,10 +8,10 @@ class DB extends R {
 
 class View extends Smarty {
   public static $DEV_MODE = false;
-  
+
   public function __construct() {
     parent::__construct();
-    
+
     if (self::$DEV_MODE) {
       $smarty -> debugging = true;
       $smarty -> caching = false;
@@ -36,9 +36,9 @@ class View extends Smarty {
     }
     $this -> assign("PUBLIC", $public_dir);
   }
-  
+
   public static function registGlobal($key = NULL, $value = NULL, $nocache = false) {
-    if($key == NULL) {
+    if ($key == NULL) {
       return false;
     } else {
       self::$global_tpl_vars[$key] = new Smarty_variable($value, $nocache);
