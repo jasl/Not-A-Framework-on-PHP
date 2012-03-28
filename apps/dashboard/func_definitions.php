@@ -1,6 +1,9 @@
 <?php
-  function func()
+class TestDomin extends BaseDomin {
+	public function func()
   {
-    return "Func in dashoard";
-  }  
+    return 'Hello world from TestDomin!';
+  }
+}
+
 ?>

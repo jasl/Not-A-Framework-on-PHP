@@ -1,7 +1,9 @@
 <?php
-require_once ROOT_DIR . '/apps/shared/func_definitions.php';
 
 abstract class AbstractApp extends Singleton {
+  protected function __construct() {
+    include_once ROOT_DIR . '/apps/shared/func_definitions.php';
+  }
   protected $filter_handler = NULL;
 
   public function setFilterHandler($filter_handler) {
@@ -17,6 +19,7 @@ abstract class AbstractApp extends Singleton {
 
 abstract class BaseDispatchApp extends AbstractApp {
   protected function __construct() {
+    parent::__construct();
     try {
       Session::init();
       $config = &Configure::init();
@@ -52,8 +55,9 @@ abstract class BaseDispatchApp extends AbstractApp {
 
 abstract class BaseApp extends AbstractApp {
   protected function __construct() {
+    parent::__construct();
     try {
-      require 'func_definitions.php';
+      include_once 'func_definitions.php';
       Session::init();
       $config = &Configure::init();
       DB::setup($config['db']['conn_str'], $config['db']['user'], $config['db']['passwd']);

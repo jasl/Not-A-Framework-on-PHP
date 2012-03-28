@@ -20,7 +20,7 @@ apps:
     display: "主面板"
     apps:
       default:
-        display: "主面板"
+        display: "仪表盘"
         path: "dashboard"
         lowest_role_level: 5
   ec_admin:

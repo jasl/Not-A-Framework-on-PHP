@@ -1,8 +1,8 @@
 <?php
-namespace shared {
-  function fun()
+class TestSharedDomin extends BaseDomin {
+  public function func()
   {
-    return "hello world!!!";
+    return 'Hello world from TestSharedDomin!';
   }
 }
 ?>

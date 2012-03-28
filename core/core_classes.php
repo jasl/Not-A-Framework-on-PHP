@@ -4,6 +4,7 @@ require_once ROOT_DIR . '/core/libs/spyc.php';
 require_once ROOT_DIR . '/core/wrap_classes.php';
 require_once ROOT_DIR . '/core/core_helpers.php';
 require_once ROOT_DIR . '/core/base_app.php';
+require_once ROOT_DIR . '/core/base_domin.php';
 
 /**
  *
@@ -77,45 +78,4 @@ final class Session {
 
 }
 
-final class Kernel extends Singleton {
-  private $initialized = false;
-
-  public function init() {
-    try {
-      Session::init();
-      $config = Configure::init();
-      DB::setup($config['db']['conn_str'], $config['db']['user'], $config['db']['passwd']);
-      View::$DEV_MODE = $config['dev_mode'];
-      View::assignGlobal('CATES', Configure::fetch('apps'));
-      View::assignGlobal('DIR_NAME', Configure::fetch('dir_name'));
-      Configure::write('index_url', 'http://' . $_SERVER['HTTP_HOST'] . '/' . Configure::fetch('dir_name'));
-      
-      $this->initialized = true;
-    } catch (exception $e) {
-      $this->initialized = false;
-      
-      $redirect_url = 'http://' . $_SERVER['HTTP_HOST'] . strrchr(dirname($_SERVER['PHP_SELF']), '/') . '/public/400.html';
-      header("Location: " . $redirect_url);
-      
-      exit;
-    }
-    return true;
-  }
-
-  public function boot() {
-    if (dirname($_SERVER['PHP_SELF']) == str_replace(DS, DS, strrchr(dirname($_SERVER['PHP_SELF']), '/'))) {
-      $apps = Configure::fetch('apps');
-      $redirect_url = 'http://' . $_SERVER['HTTP_HOST'] . strrchr(dirname($_SERVER['PHP_SELF']), '/') . '/apps/' . $apps['default']['apps']['default']['path'];
-      header("Location: " . $redirect_url);
-    } else {
-      $cur_app = preg_replace("/^(\S+)\/(\w+)\//i", "$2", $_SERVER['REQUEST_URI']);
-      Configure::write('app', $cur_app);
-      View::assignGlobal('CUR_APP', $cur_app);
-
-      $app = new App;
-      $app -> run();
-    }
-  }
-
-}
 ?>
