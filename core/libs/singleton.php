@@ -1,7 +1,7 @@
 <?php
 abstract class Singleton {
   private static $_instance = array();
-  private function __construct() {
+  protected function __construct() {
   }
 
   final private function __clone() {
