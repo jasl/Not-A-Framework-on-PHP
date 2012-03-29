@@ -22,24 +22,24 @@ apps:
       default:
         display: "仪表盘"
         path: "dashboard"
-        lowest_role_level: 5
+        role: [0, 1, 5, 6]
   ec_admin:
     display: "ECStore实例管理"
     apps:
       clear:
         display: "重置实例"
         path: "clear"
-        lowest_role_level: 5
+        role: [0, 1, 5]
       backup:
         display: "备份实例"
         path: "backup"
-        lowest_role_level: 5
+        role: [0, 1, 5]
   manage:
     display: "系统管理"
     apps:
       manage_user: 
         display: "用户管理"
         path: "manage_user"
-        lowest_role_level: 0
+        role: [0, 1, 5]
 
 

@@ -2,10 +2,51 @@
 
 abstract class AbstractApp extends Singleton {
   protected function __construct() {
-    include_once ROOT_DIR . '/apps/shared/func_definitions.php';
+    include_once ROOT_DIR . '/apps/shared/domain_definitions.php';
+    $app = $this -> get_app_config();
+    if (isset($app['role'])) {
+      $this -> permission = $app['role'];
+    }
   }
 
-  protected $filter_handler = NULL;
+  protected $filter_faild_handler = NULL;
+  protected $authorize_faild_handler = NULL;
+  protected $permission = array();
+
+  public function get_app_config() {
+    $cates = &Configure::fetch('apps');
+
+    foreach ($cates as $cate) {
+      foreach ($cate['apps'] as $app) {
+        if ($app['path'] == Configure::fetch('cur_app')) {
+          return $app;
+        }
+      }
+    }
+    return array();
+  }
+
+  public function test_can_run($role) {
+    if (empty($this -> permission) || in_array(DEFAULT_ROLE, $this -> permission)) {
+      return true;
+    } else {
+      return in_array($role, $this -> permission);
+    }
+  }
+
+  protected function handle_faild($handler) {
+    if (is_string($handler)) {
+      $url = 'http://' . $_SERVER['HTTP_HOST'] . '/' . $handler;
+      header('Location: ' . $url);
+    } elseif (is_a($handler, 'AbstractApp')) {
+      $handler -> run();
+    } elseif (is_callable($handler)) {
+      handler();
+    } else {
+      AppHelper::redirect_to_root();
+    }
+    return;
+  }
 
   public function setFilterHandler($filter_handler) {
     $this -> filter_handler = $filter_handler;
@@ -18,38 +59,11 @@ abstract class AbstractApp extends Singleton {
   public abstract function run();
 }
 
-abstract class BaseDispatchApp extends AbstractApp {
-  protected function __construct() {
-    parent::__construct();
-  }
-
-  protected abstract function forward();
-
-  public function run() {
-    if (!$this -> before_filter()) {
-      if (is_string($this -> filter_handler)) {
-        $url = 'http://' . $_SERVER['HTTP_HOST'] . '/' . $this -> filter_handler;
-        AppHelper::redirect($url);
-      } elseif (is_a($this -> filter_handler, 'BaseApp')) {
-        $this -> filter_handler -> run();
-      } elseif (is_callable($this -> filter_handler)) {
-        $this -> filter_handler();
-      } else {
-        $url = 'http://' . $_SERVER['HTTP_HOST'] . '/' . Configure::fetch('dir_name');
-        AppHelper::redirect($url);
-      }
-      return;
-    }
-    $this -> forward();
-  }
-
-}
-
 abstract class BaseApp extends AbstractApp {
   protected function __construct() {
     parent::__construct();
     try {
-      include_once 'func_definitions.php';
+      include_once 'domain_definitions.php';
       $this -> view = new View;
     } catch (exception $e) {
       $redirect_url = 'http://' . $_SERVER['HTTP_HOST'] . strrchr(dirname($_SERVER['PHP_SELF']), '/') . '/public/400.html';
@@ -82,19 +96,11 @@ abstract class BaseApp extends AbstractApp {
   }
 
   public function run() {
+    if (!$this -> test_can_run(AuthorizeHelper::get_cur_role())) {
+      $this -> handle_faild($this -> authorize_faild_handler);
+    }
     if (!$this -> before_filter()) {
-      if (is_string($this -> filter_handler)) {
-        $url = 'http://' . $_SERVER['HTTP_HOST'] . '/' . $this -> filter_handler;
-        header('Location: ' . $url);
-      } elseif (is_a($this -> filter_handler, 'BaseApp')) {
-        $this -> filter_handler -> run();
-      } elseif (is_callable($this -> filter_handler)) {
-        $this -> filter_handler();
-      } else {
-        $url = 'http://' . $_SERVER['HTTP_HOST'] . '/' . Configure::fetch('dir_name');
-        AppHelper::redirect($url);
-      }
-      return;
+      $this -> handle_faild($this -> filter_faild_handler);
     }
     if ($_SERVER['REQUEST_METHOD'] == 'POST' && is_callable($this -> do_post)) {
       $this -> do_post();

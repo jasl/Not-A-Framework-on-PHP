@@ -4,7 +4,7 @@ require_once ROOT_DIR . '/core/libs/spyc.php';
 require_once ROOT_DIR . '/core/wrap_classes.php';
 require_once ROOT_DIR . '/core/core_helpers.php';
 require_once ROOT_DIR . '/core/base_app.php';
-require_once ROOT_DIR . '/core/base_domin.php';
+require_once ROOT_DIR . '/core/base_domain.php';
 
 /**
  *
@@ -68,7 +68,7 @@ final class Session {
     }
   }
 
-  public static function read($key = NULL) {
+  public static function fetch($key = NULL) {
     if ($key == NULL || !isset($_SESSION[$key])) {
       return NULL;
     } else {
@@ -77,5 +77,4 @@ final class Session {
   }
 
 }
-
 ?>

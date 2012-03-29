@@ -13,8 +13,10 @@ class App extends BaseApp {
     $this->display();
   }
   public function do_get() {
-    $this->assign('shared_func', TestSharedDomin::getInstance()->func());
-    $this->assign('func', TestDomin::getInstance()->func());
+    Session::write('test', 'Test from session!');
+    $this->assign('shared_func', TestSharedDomain::getInstance()->func());
+    $this->assign('func', TestDomain::getInstance()->func());
+    $this->assign('test_session', Session::fetch('test'));
     $this->display();
   }
 }
